@@ -18,8 +18,8 @@ scriptCheck.close()
 ##### CONFIG #####
 
 #Login Information (Currently HAVM31 - Laveen)
-GMAIL_ADDRESS = '<Gmail to send from (Must be existing account)>'
-GMAIL_PASSWORD = '<Gmail password>'
+GMAIL_ADDRESS = '<Email to send from (Must be existing account)>'
+GMAIL_PASSWORD = '<Email password>'
 sshHost = '<Host IP>'
 sshUser = '<Host user>'
 sshKey = '/etc/apcupsd/<Private key>'
@@ -27,7 +27,7 @@ MACAddress = '<Host MAC>'
 
 #Email Contents
 to_emails = ["<Email to notify>"]
-msg_subject = "STATUS OKAY: <Campus> UPS is back on normal power. {}".format(long_timestamp())
+msg_subject = "STATUS OKAY: <Location> UPS is back on normal power. {}".format(long_timestamp())
 
 #SSH Commands (If not logged in as root, add sudo)
 vmStart = 'xe vm-start --multiple'

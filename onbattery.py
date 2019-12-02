@@ -18,15 +18,15 @@ scriptCheck.close()
 ##### CONFIG #####
 
 #Login Information (Currently <Host> - <Campus>)
-GMAIL_ADDRESS = '<Gmail to send from (Must be existing account)>'
-GMAIL_PASSWORD = '<Gmail password>'
+GMAIL_ADDRESS = '<Email to send from (Must be existing account)>'
+GMAIL_PASSWORD = '<Email password>'
 sshHost = '<Host IP>'
 sshUser = '<Host user>'
 sshKey = '/etc/apcupsd/<Private key>'
 
 #Email Contents
 to_emails = ["<Email to notify"]
-msg_subject = "ALERT: <Campus> UPS detected a power failure! {}".format(long_timestamp())
+msg_subject = "ALERT: <Location> UPS detected a power failure! {}".format(long_timestamp())
 
 #SSH Commands (If not logged in as root, add sudo)
 vmShutdown = 'xe vm-shutdown --multiple'
