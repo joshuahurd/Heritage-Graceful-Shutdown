@@ -26,7 +26,7 @@ sshKey = '/etc/apcupsd/<Private key>'
 
 #Email Contents
 to_emails = ["<Email to notify"]
-msg_subject = "ALERT: Laveen UPS detected a power failure! {}".format(long_timestamp())
+msg_subject = "ALERT: <Campus> UPS detected a power failure! {}".format(long_timestamp())
 
 #SSH Commands (If not logged in as root, add sudo)
 vmShutdown = 'xe vm-shutdown --multiple'
