@@ -9,7 +9,7 @@ print("Off battery functions imported.")
 print("Checking if script is already running...")
 if os.path.exists('/tmp/offbatteryrunning') == True:
     print("Script is already running so stopping here!!")
-    close_offbattery()
+    exit
 print("Nope! Continuing script.")
 scriptCheck = open("/tmp/offbatteryrunning", "w+")
 scriptCheck.write("This file will only exist if the offbattery script is running.")
