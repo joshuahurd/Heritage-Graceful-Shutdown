@@ -24,6 +24,7 @@ sshHost = '<Host IP>'
 sshUser = '<Host user>'
 sshKey = '/etc/apcupsd/<Private key>'
 MACAddress = '<Host MAC>'
+VOIPAddress = '<VOIP MAC>'
 
 #Email Contents
 to_emails = ["<Email to notify>"]
@@ -39,23 +40,30 @@ host_additional_time = 60
 vm_startup_time = 60
 
 
-
-##### Script sequence, do not change! #####
+#Remove VOIP server section below if not applicable
+##### Script sequence! #####
 
 syslog.openlog('[UPS]')
 f = io.StringIO()
 printLog = "{0}".format(f.getvalue())
 print("{}: Beginning sequence...".format(short_timestamp()))
 with redirect_stdout(f):
+    #Boot host server
     print("{}: Waiting ".format(short_timestamp()) + str(battery_on_time) + " seconds to confirm power restoration.")
     wait(battery_on_time)
     autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    print("{}: Power restoration confirmed. Sending automated startup commands to XenServer...".format(short_timestamp()))
+    print("{}: Power restoration confirmed. Sending automated startup commands to host...".format(short_timestamp()))
     wakeywakey(MACAddress)
     wait(host_startup_time)
     autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
     startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    startup(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+    startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+    #Boot VOIP server
+    print("{}: Starting VOIP server...")
+    wakeywakey(VOIPAddress)
+    wait(host_startup_time)
+    autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+    voipConfirm(voipCheck,VOIPAddress)
 email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
 print("Email notification sent.")
 close_offbattery()

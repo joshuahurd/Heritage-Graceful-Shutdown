@@ -1,13 +1,14 @@
 This is a readme for the Heritage Graceful Shutdown scripts for APCUPSD. Until an installer is made, the process for getting these scripts to work is somewhat complicated.
 
-To run these scripts it is assumed you already have an APC UPS, you are running virtual machines on a linux-based host, and you have a linux machine running these scripts.
+To run these scripts it is assumed you already have an APC UPS, you are running virtual machines on a XenServer based host, and you have a linux machine running these scripts.
+It is possible to run these scripts without XenServer, but modification to the language and SSH commands will be necessary. We use a Raspberry Pi to run these scripts.
 
 Installation:
 Download APCUPSD for Linux. (This is the software that APC provides for free and monitors the UPS)
 -Add file path to execute onbattery and offbattery scripts in the apccontrol file under /etc/apcupsd/
 -Add onbattery, offbattery, and batterydefs scripts to the same folder.
 -Change configs found in onbattery and offbattery to match your specific needs.
--Edit apcupsd.conf to match your installation. You will probably need to exercise some Google-fu here.
+-Edit apcupsd.conf to match your installation (USB, Network, Serial, etc.). You will probably need to exercise some Google-fu here.
 Install Postfix Mail utility for Linux and configure it for your notifier email address (Note: This is email you're sending FROM)
 Install Python3
 Install Paramiko, APCAccess, and WakeOnLan modules for Python3 using PIP command.

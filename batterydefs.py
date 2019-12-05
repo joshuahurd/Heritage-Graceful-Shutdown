@@ -85,6 +85,24 @@ def pingCheck(sshHost):
     else:
         return 0
 
+def voipCheck(VOIPAddress):
+    response = os.system("ping -c 1 " + VOIPAddress)
+    if response == 0:
+        return 1
+    else:
+        return 0
+
+def voipConfirm(voipCheck,VOIPAddress,host_startup_time,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f,short_timestamp):
+    if voipCheck == 0:
+        wakeywakey(VOIPAddress)
+        wait(host_startup_time)
+        autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+        if voipCheck == 0:
+            print("{}: VOIP Server is not responding. Unable to start VOIP Server.".format(short_timestamp()))
+    else:
+        print("{}: VOIP Server has successfully started!".format(short_timestamp()))
+    
+
 def shutdownConfirm(sshHost,sshUser,sshKey,vmShutdown,vmForcedown,hostDisable,hostShutdown,vm_shutdown_time,vm_additional_time,host_shutdown_time,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
     if pingCheck(sshHost) == 0:
         print("{}: Host is shut down!".format(short_timestamp()))
@@ -122,7 +140,7 @@ def autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
         email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
         close_offbattery()
 
-def startup(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
+def startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(sshHost, username=sshUser, key_filename=sshKey)
@@ -147,10 +165,6 @@ def startup(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails
             print("{}: VM's appear to be running!".format(short_timestamp()))
         else:
             print("{}: VM's still aren't started, host is awake but unable to start VM's.".format(short_timestamp()))
-            printLog = "{0}".format(f.getvalue())
-            email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
-            print("Email notification sent.")
-            close_offbattery()
     ssh.close()
 
 def startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
@@ -169,13 +183,5 @@ def startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_s
                 print("{}: Host is started!".format(short_timestamp()))
             else:
                 print("{}: Host isn't responding, can't continue with automated startup.".format(short_timestamp()))
-                printLog = "{0}".format(f.getvalue())
-                email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
-                print("Email notification sent.")
-                close_offbattery()
         else:
-                print("{}: Host isn't responding, can't continue with automated startup.".format(short_timestamp()))
-                printLog = "{0}".format(f.getvalue())
-                email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
-                print("Email notification sent.")
-                close_offbattery()
+            print("{}: Host is started!.".format(short_timestamp()))
