@@ -17,7 +17,7 @@ scriptCheck.close()
 
 ##### CONFIG #####
 
-#Login Information (Currently HAVM31 - Laveen)
+#Login Information (Currently <Host> - <Campus>)
 GMAIL_ADDRESS = '<Email to send from (Must be existing account)>'
 GMAIL_PASSWORD = '<Email password>'
 sshHost = '<Host IP>'
