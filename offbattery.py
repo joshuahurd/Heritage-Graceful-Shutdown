@@ -23,8 +23,8 @@ GMAIL_PASSWORD = '<Email password>'
 sshHost = '<Host IP>'
 sshUser = '<Host user>'
 sshKey = '/etc/apcupsd/<Private key>'
-MACAddress = '<Host MAC>'
-VOIPAddress = '<VOIP MAC>'
+MACAddress = '<Host MAC>' #Use #.#.#.#.#.#
+VOIPAddress = '<VOIP MAC>' #Use #.#.#.#.#.#
 
 #Email Contents
 to_emails = ["<Email to notify>"]
