@@ -51,32 +51,35 @@ def email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD):
     s.quit()
 
 def shutdown(sshHost,sshUser,sshKey,vmShutdown,vmForcedown,hostDisable,hostShutdown,vm_shutdown_time,vm_additional_time,host_shutdown_time,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(sshHost, username=sshUser, key_filename=sshKey)
-    print("{}: VM's are shutting down...".format(short_timestamp()))
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmShutdown)
-    wait(vm_shutdown_time)
-    autostop_shutdown(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("xe vm-list")
-    commandRead = ssh_stdout.read()
-    commandList = commandRead.split()
-    if commandList.count('running') > 1:
-        print("{}: VM's still running, waiting ".format(short_timestamp()) + str(vm_additional_time) + " more seconds...")
-        wait(vm_additional_time)
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(sshHost, username=sshUser, key_filename=sshKey)
+        print("{}: VM's are shutting down...".format(short_timestamp()))
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmShutdown)
+        wait(vm_shutdown_time)
         autostop_shutdown(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmForcedown)
-        print("{}: Force shutdown command sent. Waiting ".format(short_timestamp()) + str(host_shutdown_time) + " seconds...")
-        wait(host_shutdown_time)
-        autostop_shutdown(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-        print("{}: VM's stopped. Shutting down host...".format(short_timestamp()))
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostDisable)
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostShutdown)
-    else:
-        print("{}: VM's stopped. Shutting down host...".format(short_timestamp()))
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostDisable)
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostShutdown)
-    ssh.close()
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("xe vm-list")
+        commandRead = ssh_stdout.read()
+        commandList = commandRead.split()
+        if commandList.count('running') > 1:
+            print("{}: VM's still running, waiting ".format(short_timestamp()) + str(vm_additional_time) + " more seconds...")
+            wait(vm_additional_time)
+            autostop_shutdown(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmForcedown)
+            print("{}: Force shutdown command sent. Waiting ".format(short_timestamp()) + str(host_shutdown_time) + " seconds...")
+            wait(host_shutdown_time)
+            autostop_shutdown(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+            print("{}: VM's stopped. Shutting down host...".format(short_timestamp()))
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostDisable)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostShutdown)
+        else:
+            print("{}: VM's stopped. Shutting down host...".format(short_timestamp()))
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostDisable)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(hostShutdown)
+        ssh.close()
+    except:
+        print("{}: The shutdown process yielded an unexpected error. Server may still be running!!".format(short_timestamp()))
 
 def pingCheck(sshHost):
     response = os.system("ping -c 1 " + sshHost)
@@ -141,35 +144,39 @@ def autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
         close_offbattery()
 
 def startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(sshHost, username=sshUser, key_filename=sshKey)
-    print("{}: VM's are starting...".format(short_timestamp()))
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmStart)
-    wait(vm_startup_time)
-    autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("xe vm-list")
-    commandRead = ssh_stdout.read()
-    commandList = commandRead.split()
-    if commandList.count('running') > 1:
-        print("{}: VM's appear to be running!".format(short_timestamp()))
-    else:
-        print("{}: VM's aren't started? Trying again.".format(short_timestamp()))
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(sshHost, username=sshUser, key_filename=sshKey)
+        print("{}: VM's are starting...".format(short_timestamp()))
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmStart)
         wait(vm_startup_time)
         autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("xe vm-list")
-        commandRead2 = ssh_stdout.read()
-        commandList2 = commandRead2.split()
-        if commandList2.count('running') > 1:
+        commandRead = ssh_stdout.read()
+        commandList = commandRead.split()
+        if commandList.count('running') > 1:
             print("{}: VM's appear to be running!".format(short_timestamp()))
         else:
-            print("{}: VM's still aren't started, host is awake but unable to start VM's.".format(short_timestamp()))
-    ssh.close()
+            print("{}: VM's aren't started? Trying again.".format(short_timestamp()))
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(vmStart)
+            wait(vm_startup_time)
+            autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("xe vm-list")
+            commandRead2 = ssh_stdout.read()
+            commandList2 = commandRead2.split()
+            if commandList2.count('running') > 1:
+                print("{}: VM's appear to be running!".format(short_timestamp()))
+            else:
+                print("{}: VM's still aren't started, host is awake but unable to start VM's.".format(short_timestamp()))
+        ssh.close()
+    except:
+        print("{}: The startup yielded an unexpected error. Server is not reachable.".format(short_timestamp()))
 
 def startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f):
     if pingCheck(sshHost) == 1:
         print("{}: Host is started!".format(short_timestamp()))
+        return 1
     if pingCheck(sshHost) == 0:
         print("{}: Host isn't responding, waiting an additional " + str(host_additional_time) + " seconds...")
         wait(host_additional_time)
@@ -181,7 +188,10 @@ def startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_s
             autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
             if pingCheck(sshHost) == 1:
                 print("{}: Host is started!".format(short_timestamp()))
+                return 1
             else:
                 print("{}: Host isn't responding, can't continue with automated startup.".format(short_timestamp()))
+                return 0
         else:
             print("{}: Host is started!.".format(short_timestamp()))
+            return 1

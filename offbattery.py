@@ -56,8 +56,8 @@ with redirect_stdout(f):
     wakeywakey(MACAddress)
     wait(host_startup_time)
     autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    startupConfirm(host_additional_time,MACAddress,vm_startup_time,sshHost,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
+    if startupConfirm == 1:
+        startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
     #Boot VOIP server
     print("{}: Starting VOIP server...")
     wakeywakey(VOIPAddress)
