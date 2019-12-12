@@ -38,6 +38,7 @@ battery_on_time = 60
 host_startup_time = 300
 host_additional_time = 60
 vm_startup_time = 60
+VOIP_startup_time = 60
 
 
 ##### Start script sequence. DO NOT ERASE OR SCRIPT WON'T WORK #####
