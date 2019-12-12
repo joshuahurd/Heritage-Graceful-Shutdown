@@ -40,30 +40,20 @@ host_additional_time = 60
 vm_startup_time = 60
 
 
-#Remove VOIP server section below if not applicable
-##### Script sequence! #####
-
+##### Start script sequence. DO NOT ERASE OR SCRIPT WON'T WORK #####
+print("Beginning sequence...")
 syslog.openlog('[UPS]')
 f = io.StringIO()
 printLog = "{0}".format(f.getvalue())
-print("{}: Beginning sequence...".format(short_timestamp()))
 with redirect_stdout(f):
-    #Boot host server
-    print("{}: Waiting ".format(short_timestamp()) + str(battery_on_time) + " seconds to confirm power restoration.")
-    wait(battery_on_time)
-    autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    print("{}: Power restoration confirmed. Sending automated startup commands to host...".format(short_timestamp()))
-    wakeywakey(MACAddress)
-    wait(host_startup_time)
-    autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    if startupConfirm == 1:
-        startupVM(sshHost,sshUser,sshKey,vm_startup_time,vmStart,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    #Boot VOIP server
-    print("{}: Starting VOIP server...")
-    wakeywakey(VOIPAddress)
-    wait(host_startup_time)
-    autostop_startup(msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,f)
-    voipConfirm(voipCheck,VOIPAddress)
+    try:
+        autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
+            host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
+        open_offbattery()
+        sequence_off_bat(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,battery_on_time,sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_additional_time,
+                    vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,host_startup_time,VOIPAddress,VOIP_startup_time,vmStart,vm_startup_time)
+    except:
+        print("{}: Power restoration was detected but there was an unexpected error with startup, server is likely not running!!".format(short_timestamp()))
 email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
 print("Email notification sent.")
-close_offbattery()
+close_onbattery()
