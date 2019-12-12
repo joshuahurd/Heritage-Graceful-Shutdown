@@ -1,6 +1,6 @@
 #This file is necessary for on and off battery scripts and defines all functions.
 
-import smtplib, sys, syslog, time, paramiko, datetime, io, os, onbattery, offbattery
+import smtplib, sys, syslog, time, paramiko, datetime, io, os
 from email.mime.text import MIMEText
 from apcaccess import status as apc
 from contextlib import redirect_stdout
@@ -46,7 +46,7 @@ def voipCheck(VOIPAddress):
 #Send an email to defined variables. Recommend use "f" variable in conjuction with "msg_subject" to email a history of events.
 def email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD):
     from_email = GMAIL_ADDRESS
-    log(msg_subject)
+    printLog(msg_subject)
     msg = MIMEText(printLog)
     msg['Subject'] = msg_subject
     msg['From'] = from_email
@@ -93,9 +93,12 @@ def VMStatus():
 #Checks if protection mode should be activated.
 def autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time):
+    print("{}: Checking if script is already running...".format(short_timestamp()))
     if protCheck() == 1:
         protMode(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
+    else:
+        print("{}: Nope! Continuing...".format(short_timestamp()))
 
 #Opens the onbattery script protection and prevents the script from running more than one instance.
 ##THIS MUST BE USED TO START THE SCRIPT##
@@ -157,7 +160,7 @@ def protMode(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time
     os.remove('/tmp/protection_mode')
     if statusCheck() == 0:
         print("{}: Protection mode has ended, and the UPS is reporting that it has power. Running offbattery script.".format(short_timestamp()))
-        offbattery
+        os.system("python3 /etc/apcupsd/offbattery")
         email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
         exit()
     elif statusCheck() == 1:
@@ -299,8 +302,11 @@ def sequence_on_bat(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdo
     wait(battery_off_time)
     autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
-    shutdown_logic_sequence(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
+    if statusCheck() == 1:
+        shutdown_logic_sequence(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
                             vm_additional_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
+    else:
+        print("{}: UPS is reporting power was restored, so exiting script.".format(short_timestamp()))
 
 #This is a long sequence of actions and checks to ensure a full restoration of servers.
 def sequence_off_bat(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,battery_on_time,sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_additional_time,
@@ -312,8 +318,11 @@ def sequence_off_bat(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD
     wait(battery_on_time)
     autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
-    startup_logic_sequence(sshHost,host_startup_time,VOIPAddress,VOIP_startup_time,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,
+    if statusCheck() == 0:
+        startup_logic_sequence(sshHost,host_startup_time,VOIPAddress,VOIP_startup_time,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,
                 hostDisable,hostShutdown,host_shutdown_time,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vmStart,vm_startup_time,printLog,vm_additional_time)
+    else:
+        print("{}: UPS is reporting power went out again, so exiting script.".format(short_timestamp()))
     
 #Sequence to perform a graceful shutdown with checks for additional needed time.
 def shutdown_logic_sequence(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
