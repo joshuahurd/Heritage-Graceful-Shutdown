@@ -56,4 +56,4 @@ with redirect_stdout(f):
         print("{}: Power restoration was detected but there was an unexpected error with startup, server is likely not running!!".format(short_timestamp()))
 email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
 print("Email notification sent.")
-close_onbattery()
+close_offbattery()
