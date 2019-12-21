@@ -31,23 +31,16 @@ vm_shutdown_time = 120
 vm_additional_time = 60
 vm_force_time = 60
 host_shutdown_time = 60
-VOIP_startup_time = 60
 
 
 ##### Start script sequence. DO NOT ERASE OR SCRIPT WON'T WORK #####
 print("Beginning sequence...")
 syslog.openlog('[UPS]')
 f = io.StringIO()
-printLog = "{0}".format(f.getvalue())
 with redirect_stdout(f):
-    try:
-        autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
-            host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
-        open_onbattery()
-        sequence_on_bat(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
-                    msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
-    except:
-        print("{}: Power outage was detected but there was an unexpected error with graceful shutdown, server is likely still running on battery power!!".format(short_timestamp()))
+    autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
+    sequence_on_bat(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
+            msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
 email(msg_subject,printLog,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
 print("Email notification sent.")
 close_onbattery()
