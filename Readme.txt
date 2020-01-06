@@ -7,7 +7,7 @@ Installation:
 Download APCUPSD for Linux. (This is the software that APC provides for free and monitors the UPS)
 -Add file path to execute onbattery and offbattery scripts in the apccontrol file under /etc/apcupsd/
 -Add onbattery, offbattery, and batterydefs scripts to the same folder.
--Change configs found in onbattery and offbattery to match your specific needs.
+-Change config titled config.py to match your specific build and network.
 -Edit apcupsd.conf to match your installation (USB, Network, Serial, etc.). You will probably need to exercise some Google-fu here.
 Install Postfix Mail utility for Linux and configure it for your notifier email address (Note: This is email you're sending FROM)
 Install Python3
