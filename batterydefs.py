@@ -302,12 +302,12 @@ def sequence_on_bat(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdo
                     msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time):
     if protCheck() == 2:
         protectionHalt(msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
-    print("{}: Power outage detected. Running onbattery script.".format(short_timestamp()))
-    open_onbattery()
     print("{}: Waiting ".format(short_timestamp()) + str(battery_off_time) + " seconds to confirm power failure.")
     wait(battery_off_time)
     autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
+    print("{}: Power outage detected. Running onbattery script.".format(short_timestamp()))
+    open_onbattery()
     if statusCheck() == 1:
         shutdown_logic_sequence(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,
                             vm_additional_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
@@ -319,12 +319,12 @@ def sequence_off_bat(msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,batter
                     vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,host_shutdown_time,host_startup_time,VOIPAddress,VOIP_startup_time,vmStart,vm_startup_time,MACAddress):
     if protCheck() == 2:
         protectionHalt(msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD)
-    print("{}: Power restoration detected. Running offbattery script.".format(short_timestamp()))
-    open_offbattery()
     print("{}: Waiting ".format(short_timestamp()) + str(battery_off_time) + " seconds to confirm power restoration.")
     wait(battery_on_time)
     autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
+    print("{}: Power restoration detected. Running offbattery script.".format(short_timestamp()))
+    open_offbattery()
     if statusCheck() == 0:
         startup_logic_sequence(sshHost,host_startup_time,VOIPAddress,VOIP_startup_time,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,
                 hostDisable,hostShutdown,host_shutdown_time,msg_subject,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vmStart,vm_startup_time,f,vm_additional_time,MACAddress)
