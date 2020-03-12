@@ -98,7 +98,7 @@ def VMStatus():
 #Checks if protection mode should be activated.
 def autostop(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time):
-    print("{}: Checking if script is already running...".format(short_timestamp()))
+    print("{}: Checking if power flapping has ocurred...".format(short_timestamp()))
     if protCheck() == 1:
         protMode(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time)
@@ -139,14 +139,11 @@ def protCheck():
         if os.path.exists('/tmp/offbatteryrunning') == True:
             print("{}: Both scripts are running.".format(short_timestamp()))
             return 1
-    if os.path.exists('/tmp/offbatteryrunning') == True:
-        if os.path.exists('/tmp/onbatteryrunning') == True:
-            print("{}: Both scripts are running.".format(short_timestamp()))
-            return 1
     else:
         return 0
             
 #Activates protection mode
+##IF PROTECTION MODE STARTS WHEN IT SHOULDN'T, CHECK IF ONBATTERYRUNNING OR OFFBATTERYRUNNING FILES EXIST IN TMP FOLDER##
 def protMode(sshHost,sshUser,sshKey,battery_off_time,vmShutdown,vm_shutdown_time,vmForcedown,vm_force_time,hostDisable,hostShutdown,
             host_shutdown_time,msg_subject,f,to_emails,GMAIL_ADDRESS,GMAIL_PASSWORD,vm_additional_time):
     scriptCheck = open('/tmp/protection_mode', "w+")
